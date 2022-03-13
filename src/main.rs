@@ -18,8 +18,13 @@ macro_rules! COMMANDS {
   };
 }
 
+macro_rules! MINIMUM_DATA_CAPACITY {
+  () => {
+    65536
+  };
+}
+
 const COMMANDS: &[u8] = COMMANDS!().as_bytes();
-const COMMANDS_LENGTH: usize = COMMANDS!().len();
 
 fn get_jumps() -> std::collections::HashMap<usize, usize> {
   let mut vector = Vec::new();
@@ -39,9 +44,9 @@ fn get_jumps() -> std::collections::HashMap<usize, usize> {
 }
 
 fn main() {
+  const COMMANDS_LENGTH: usize = COMMANDS!().len() - 1;
   let jumps = get_jumps();
-  let mut data = Vec::new();
-  data.push(0);
+  let mut data = vec![0; MINIMUM_DATA_CAPACITY!()];
   let mut data_pointer = 0;
   let mut instruction_pointer = 0;
 
@@ -58,7 +63,7 @@ fn main() {
       b'>' => {
         data_pointer += 1;
 
-        if data_pointer > data.len() - 1 {
+        if data_pointer == data.len() {
           data.push(0);
         }
       }
@@ -77,7 +82,7 @@ fn main() {
 
     instruction_pointer += 1;
 
-    if instruction_pointer > COMMANDS_LENGTH - 1 {
+    if instruction_pointer > COMMANDS_LENGTH {
       return;
     }
   }
